@@ -9,17 +9,17 @@ jwt-cracker: https://github.com/lmammino/jwt-cracker
 To install jwt-cracker-go, you need to have Go installed on your machine.
 
 ```sh
-go install github.com/elvisgraho/jwt-cracker-go
+go install github.com/elvisgraho/jwt-cracker-go@latest
 ```
 
 ## Usage
 
 To use jwt-cracker-go, provide the following parameters:
 
-* **-t**    Specify the HMAC-SHA JWT token to crack (required).
-* **-a**    Define the alphabet to use for the brute force (optional).
-* **-max**  Set the maximum length of the secret (optional).
-* **-f**    Use a password file instead of brute force (optional).
+* **-t** Specify the HMAC-SHA JWT token to crack (required).
+* **-a** Define the alphabet to use for the brute force (optional).
+* **-max** Set the maximum length of the secret (optional).
+* **-f** Use a password file instead of brute force (optional).
 
 ### Examples
 
