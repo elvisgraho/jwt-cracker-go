@@ -10,7 +10,9 @@ import (
 	"hash"
 	"log"
 	"os"
+	"runtime"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -73,33 +75,73 @@ func NextCombination(s string, charSet string) string {
 func Brute(charSet string, maxLen int, algorithm string, jwtParts []string) string {
 	signatureFunc := SignatureGenerator(algorithm, jwtParts)
 	targetSignature := jwtParts[2]
+	workerCount := runtime.NumCPU()
+	chunkSize := 240 // how many combinations each worker will process
 
-	combinationsProcessed := 0
+	fmt.Printf("Worker count: %v\n", workerCount)
+
 	for length := 1; length <= maxLen; length++ {
 		lastChar := string(charSet[len(charSet)-1])
 		lastCombination := lastChar + strings.Repeat(lastChar, length-1)
-
-		// totalPossibleCombinations := int(math.Pow(float64(len(charSet)), float64(length)))
-		// fmt.Println("Current Length:", length, "combinations:", totalPossibleCombinations)
 
 		startTime := time.Now()
 		combination := string(charSet[0]) // Start with the first character for each length
 
 		for {
-			if signatureFunc(combination) == targetSignature {
-				return combination
-			}
-			if combination == lastCombination {
-				break // Check against pre-calculated last combination
-			}
-			combination = NextCombination(combination, charSet) // Ensure this function is efficient
-			combinationsProcessed++
-		}
+			var chunkList [][]string
+			var endOfCombinations bool
 
+			// generate combinations to brute
+			for worker := 0; worker < workerCount; worker++ {
+				var chunks []string
+				for ch := 0; ch < chunkSize; ch++ {
+					chunks = append(chunks, combination)
+					combination = NextCombination(combination, charSet)
+					if combination == lastCombination {
+						endOfCombinations = true
+						break
+					}
+				}
+				chunkList = append(chunkList, chunks)
+				if endOfCombinations {
+					break
+				}
+			}
+
+			// brute combinations with workers
+			var wg sync.WaitGroup
+			guessedCombination := make(chan string, 1)
+
+			for i := range chunkList {
+				wg.Add(1)
+				go func(chunk *[]string) {
+					defer wg.Done()
+					for _, candidate := range *chunk {
+						if signatureFunc(candidate) == targetSignature {
+							guessedCombination <- candidate
+							close(guessedCombination)
+							break
+						} else if len(guessedCombination) > 0 {
+							break
+						}
+					}
+				}(&chunkList[i])
+			}
+
+			wg.Wait()
+
+			if len(guessedCombination) > 0 {
+				return <-guessedCombination
+			} else {
+				close(guessedCombination)
+				if endOfCombinations {
+					break
+				}
+			}
+		}
 		duration := time.Since(startTime).Seconds()
 		if duration > 0 {
-			cps := float64(combinationsProcessed) / duration // Combinations per second
-			fmt.Printf("%.0fK/s\n", cps/1000)
+			fmt.Printf("%v letter combinations took %v seconds\n", length, duration)
 		}
 	}
 

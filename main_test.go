@@ -35,15 +35,15 @@ func TestCrackJWTToken(t *testing.T) {
 		isTokenValid, algorithm := utils.ValidateToken(tt.token)
 
 		if !isTokenValid && tt.token == "" {
-			t.Errorf("CrackTokenFunction() Invalid Token!")
+			t.Errorf("TestCrackJWTToken() Invalid Token!")
 		}
 
 		jwtParts := strings.Split(tt.token, ".")
 
 		t.Run(tt.name, func(t *testing.T) {
-			got := utils.Brute(utils.DefaultAlphabet, utils.DefaultMaxSecretLength, algorithm, jwtParts) // Replace CrackTokenFunction with your actual function to crack the token
+			got := utils.Brute(utils.DefaultAlphabet, utils.DefaultMaxSecretLength, algorithm, jwtParts)
 			if got != tt.want {
-				t.Errorf("CrackTokenFunction() = %v, want %v", got, tt.want)
+				t.Errorf("Brute() = %v, want %v", got, tt.want)
 			}
 		})
 	}
