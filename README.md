@@ -35,6 +35,15 @@ jwt-cracker-go -t eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwI
 jwt-cracker-go -t your.jwt.token -f /path/to/password/file
 ```
 
+### Comparison
+
+Here is the comparison for secret: aecre
+Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.EhFb3dw98PWWVtDnWN7joeTQBhnE3Z3AnAFaQpbn358
+
+| jwt-cracker-go  | jwt-cracker |
+| ------------- | ------------- |
+| 13.660 sec  | 257.501 sec  |
+
 ### License
 
 jwt-cracker-go is open-sourced software licensed under the MIT license.
