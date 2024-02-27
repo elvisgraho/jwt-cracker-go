@@ -2,7 +2,7 @@
 
 jwt-cracker-go is a simple brute force cracker for HS256, HS384, and HS512 JWT tokens, inspired by jwt-cracker. It is effective for cracking JWT tokens with weak secrets.
 
-jwt-cracker: https://github.com/lmammino/jwt-cracker
+jwt-cracker: <https://github.com/lmammino/jwt-cracker>
 
 ## Installation
 
@@ -17,7 +17,7 @@ go install github.com/elvisgraho/jwt-cracker-go@latest
 To use jwt-cracker-go, provide the following parameters:
 
 * **-t** Specify the HMAC-SHA JWT token to crack (required).
-* **-a** Define the alphabet to use for the brute force (optional).
+* **-a** Define the alphabet to use for the brute force (optional). Default - abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
 * **-max** Set the maximum length of the secret (optional).
 * **-f** Use a password file instead of brute force (optional).
 
