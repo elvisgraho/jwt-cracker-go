@@ -1,50 +1,83 @@
 # jwt-cracker-go
 
-jwt-cracker-go is a simple brute force cracker for HS256, HS384, and HS512 JWT tokens, inspired by jwt-cracker. It is effective for cracking JWT tokens with weak secrets.
+A fast JWT token cracker that supports multiple algorithms and cracking methods. Built in Go.
 
-jwt-cracker: <https://github.com/lmammino/jwt-cracker>
+## Features
+
+- **Multiple Algorithms**: Supports HS256, HS384, HS512, RS256, RS384, RS512, ES256, ES384, ES512
+- **Cracking Methods**:
+  - Brute force with custom alphabet and max length
+  - Dictionary attack with password files
+  - Pattern-based cracking
+- **Token Analysis**: Analyzes tokens for security issues
+- **Secret Generation**: Generates common JWT secrets
+- **Progress Tracking**: Real-time progress with ETA
+- **Parallel Processing**: Multi-core support for faster cracking
 
 ## Installation
 
-To install jwt-cracker-go, you need to have Go installed on your machine.
-
-```sh
+```bash
 go install github.com/elvisgraho/jwt-cracker-go@latest
 ```
 
 ## Usage
 
-To use jwt-cracker-go, provide the following parameters:
+### Basic Usage
 
-* **-t** Specify the HMAC-SHA JWT token to crack (required).
-* **-a** Define the alphabet to use for the brute force (optional).  
-    Default - abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
-* **-max** Set the maximum length of the secret (optional).
-* **-f** Use a password file instead of brute force (optional).
+```bash
+jwt-cracker-go -t <jwt_token> [options]
+```
+
+### Options
+
+- `-t`: JWT token to crack (required)
+- `-a`: Alphabet for brute force (default: a-zA-Z0-9)
+- `-max`: Maximum secret length (default: 12)
+- `-f`: Password file for dictionary attack
+- `-p`: Pattern for secret generation (base64, hex, uuid, email, date, ip)
+- `-alg`: Specify JWT algorithm
+- `-analyze`: Analyze token for security issues
+- `-generate`: Generate common JWT secrets
+- `-o`: Output file for results
+- `-v`: Verbose output
+- `-c`: Number of concurrent workers (0 = CPU count)
+- `-batch`: Batch size for processing (0 = auto)
+- `-force`: Force cracking even if token is invalid
 
 ### Examples
 
-#### Brute Force Mode
-
-```sh
-jwt-cracker-go -t eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.5mhBHqs5_DTLdINd9p5m7ZJ6XD0Xc55kIaCRY5r6HRA -a "abcdefghijklmnopqrstuvwxyz" -max 8
+1. Brute force attack:
+```bash
+jwt-cracker-go -t eyJhbGciOiJIUzI1NiIs... -max 8
 ```
 
-#### Dictionary Mode
-
-```sh
-jwt-cracker-go -t your.jwt.token -f /path/to/password/file
+2. Dictionary attack:
+```bash
+jwt-cracker-go -t eyJhbGciOiJIUzI1NiIs... -f passwords.txt
 ```
 
-### Comparison
+3. Analyze token:
+```bash
+jwt-cracker-go -t eyJhbGciOiJIUzI1NiIs... -analyze
+```
 
-Here is the comparison for secret: **aecre**  
-**Token:** eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.EhFb3dw98PWWVtDnWN7joeTQBhnE3Z3AnAFaQpbn358
+4. Generate secrets:
+```bash
+jwt-cracker-go -generate -o secrets.txt
+```
 
-| jwt-cracker-go  | jwt-cracker |
-| ------------- | ------------- |
-| 13.660 sec  | 257.501 sec  |
+5. Pattern-based cracking:
+```bash
+jwt-cracker-go -t eyJhbGciOiJIUzI1NiIs... -p base64
+```
 
-### License
+## Performance
 
-jwt-cracker-go is open-sourced software licensed under the MIT license.
+- Multi-core parallel processing
+- Efficient batch processing
+- Memory-optimized for large dictionaries
+- Progress tracking with ETA
+
+## License
+
+MIT License

@@ -7,8 +7,13 @@ import (
 	"strings"
 )
 
-// SupportedAlgorithms defines the list of supported HMAC algorithms for the JWT.
-var SupportedAlgorithms = []string{"HS256", "HS384", "HS512"}
+// SupportedAlgorithms defines the list of supported algorithms for the JWT.
+var SupportedAlgorithms = []string{
+	"HS256", "HS384", "HS512",
+	"RS256", "RS384", "RS512",
+	"ES256", "ES384", "ES512",
+	"none",
+}
 
 // DecodeHeader decodes the header part of a JWT token.
 func DecodeHeader(token string) (map[string]interface{}, error) {
@@ -17,7 +22,13 @@ func DecodeHeader(token string) (map[string]interface{}, error) {
 		return nil, fmt.Errorf("invalid token format: header part missing")
 	}
 
-	headerData, err := base64.RawURLEncoding.DecodeString(parts[0])
+	// Add padding if needed
+	headerStr := parts[0]
+	if l := len(headerStr) % 4; l > 0 {
+		headerStr += strings.Repeat("=", 4-l)
+	}
+
+	headerData, err := base64.StdEncoding.DecodeString(headerStr)
 	if err != nil {
 		return nil, fmt.Errorf("invalid token format: failed to decode header")
 	}
@@ -32,7 +43,7 @@ func DecodeHeader(token string) (map[string]interface{}, error) {
 
 // ValidateToken checks if the token is valid based on its format and header's algorithm.
 func ValidateToken(token string) (bool, string) {
-	isTokenValid := validateGeneralJwtFormat(token) && validateHmacAlgorithmHeader(token)
+	isTokenValid := validateGeneralJwtFormat(token)
 	var algorithm string
 	if isTokenValid {
 		header, err := DecodeHeader(token)
@@ -57,11 +68,6 @@ func validateGeneralJwtFormat(token string) bool {
 		return false
 	}
 
-	if len(parts[2]) == 0 {
-		fmt.Println("This is a token without any encription.")
-		return false
-	}
-
 	for _, part := range parts {
 		if len(part) == 0 {
 			fmt.Println("Invalid token format. Parts should not be empty.")
@@ -72,30 +78,8 @@ func validateGeneralJwtFormat(token string) bool {
 	return true
 }
 
-// validateHmacAlgorithmHeader checks the algorithm in the token header.
-func validateHmacAlgorithmHeader(token string) bool {
-	header, err := DecodeHeader(token)
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
-
-	if typ, ok := header["typ"].(string); !ok || typ != "JWT" {
-		fmt.Printf("Unsupported Typ: %v\n", header["typ"])
-		return false
-	}
-
-	alg, ok := header["alg"].(string)
-	if !ok || !isSupportedAlgorithm(alg) {
-		fmt.Printf("Unsupported algorithm: %s. Only %v are supported.\n", alg, SupportedAlgorithms)
-		return false
-	}
-
-	return true
-}
-
-// isSupportedAlgorithm checks if the given algorithm is in the list of supported algorithms.
-func isSupportedAlgorithm(alg string) bool {
+// IsSupportedAlgorithm checks if the given algorithm is in the list of supported algorithms.
+func IsSupportedAlgorithm(alg string) bool {
 	for _, a := range SupportedAlgorithms {
 		if alg == a {
 			return true
